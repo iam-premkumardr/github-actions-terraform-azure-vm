@@ -1,0 +1,59 @@
+name: "Terraform Linux VM Deployment"
+
+on:
+  push:
+    paths:
+      - "linux/**"
+  pull_request:
+    paths:
+      - "linux/**"
+
+jobs:
+  terraform:
+    name: "Terraform Linux VM"
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code from the repository
+      - name: "Checkout Repository"
+        uses: actions/checkout@v3
+
+      # Set up Terraform
+      - name: "Set up Terraform"
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
+
+      # Initialize Terraform
+      - name: "Terraform Init"
+        run: terraform init -backend-config="linux/backend-config.tfbackend"
+        working-directory: linux/
+        env:
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Format Terraform files
+      - name: "Terraform Format"
+        run: terraform fmt -check
+        working-directory: linux/
+       
+
+      # Validate Terraform configuration
+      - name: "Terraform Validate"
+        run: terraform validate
+        working-directory: linux/
+   
+
+      # Terraform Plan
+      - name: "Terraform Plan"
+        run: terraform plan
+        working-directory: linux/
+        env:
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Apply the Terraform changes
+      - name: "Terraform Apply"
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
+        working-directory: linux/
+        env:
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

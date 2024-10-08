@@ -1,0 +1,4 @@
+resource_group_name  = "doc-sto-rg"
+storage_account_name = "docstoacc"
+container_name       = "doc-terraform-tfstate"
+key                  = "terraform.tfstate"
