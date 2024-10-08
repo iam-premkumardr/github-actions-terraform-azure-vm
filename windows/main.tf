@@ -5,7 +5,7 @@ provider "azurerm" {
 }
 
 
-# Resource Group Module
+## Resource Group Module
 module "resource_group" {
   source     = "../modules/resource_group"
   rg_name    = "${var.app_name}-${var.resource_group_name}"
